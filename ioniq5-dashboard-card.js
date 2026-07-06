@@ -156,6 +156,11 @@ class Ioniq5DashboardCard extends LitElement {
 
   getCardSize() { return 7; }
 
+  // Default-Konfiguration für den visuellen Editor beim Hinzufügen aus der Kartenliste
+  static getStubConfig() {
+    return { entity: '', title: 'IONIQ 5 Fahrdaten' };
+  }
+
   // ── willUpdate: Daten berechnen VOR dem Rendern ───────────────────────────
   // Läuft synchron vor render(). Setzt keine reaktiven Properties
   // → kein zusätzlicher Render-Zyklus.
@@ -425,3 +430,14 @@ class Ioniq5DashboardCard extends LitElement {
 }
 
 customElements.define('ioniq5-dashboard-card', Ioniq5DashboardCard);
+
+// Registrierung für die visuelle Kartenauswahl ("+ Karte hinzufügen").
+// Ohne diesen Eintrag funktioniert die Karte nur über manuelles YAML
+// (type: custom:ioniq5-dashboard-card), taucht aber nicht in der Liste auf.
+window.customCards = window.customCards || [];
+window.customCards.push({
+  type: 'ioniq5-dashboard-card',
+  name: 'IONIQ 5 Dashboard Card',
+  description: 'Fahrdaten (Strecke, Verbrauch, Rekuperation, Effizienz) des IONIQ 5 als Balken- und Liniendiagramme.',
+  preview: false,
+});
