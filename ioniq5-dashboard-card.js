@@ -2,8 +2,14 @@
  * IONIQ 5 Dashboard Card – Home Assistant Custom Lovelace Card
  * Implementiert mit LitElement (gleiches Framework wie das HA Energy Dashboard)
  *
- * Installation:
- *   1. Datei nach /config/www/ioniq5-dashboard/ioniq5-dashboard-card.js kopieren
+ * Installation über HACS (empfohlen):
+ *   HACS → Frontend → ⋮ → Benutzerdefinierte Repositories →
+ *   dieses Repo als "Dashboard" hinzufügen → installieren.
+ *   HACS trägt die Ressource automatisch ein.
+ *
+ * Manuelle Installation:
+ *   1. Diesen Ordner nach /config/www/ioniq5-dashboard/ kopieren
+ *      (ioniq5-dashboard-card.js, lit-core.min.js, chart.umd.js)
  *   2. HA → Einstellungen → Dashboards → Ressourcen → Hinzufügen
  *      URL:  /local/ioniq5-dashboard/ioniq5-dashboard-card.js   Typ: JavaScript-Modul
  *   3. Browser hart neu laden (Strg+Umschalt+R)
@@ -14,11 +20,13 @@
  *   title: IONIQ 5 Fahrdaten     # optional
  */
 
-import { LitElement, html, css, nothing } from
-  "/local/ioniq5-dashboard/lit-core.min.js";
+// Pfade relativ zur eigenen Modul-URL auflösen, statt einen festen Ordner
+// anzunehmen. So funktioniert die Card unabhängig davon, ob sie manuell
+// oder über HACS (eigener Ordnername pro Repository) installiert wurde.
+import { LitElement, html, css, nothing } from "./lit-core.min.js";
 
 // ── Chart.js laden (einmalig, Ergebnis gecacht) ───────────────────────────────
-const CHARTJS_CDN = '/local/ioniq5-dashboard/chart.umd.js';
+const CHARTJS_URL = new URL('./chart.umd.js', import.meta.url).href;
 let _chartJsPromise = null;
 
 function loadChartJS() {
@@ -26,7 +34,7 @@ function loadChartJS() {
   if (_chartJsPromise) return _chartJsPromise;
   _chartJsPromise = new Promise((resolve, reject) => {
     const s = document.createElement('script');
-    s.src = CHARTJS_CDN;
+    s.src = CHARTJS_URL;
     s.onload = resolve;
     s.onerror = () => reject(new Error('Chart.js konnte nicht geladen werden – Internetverbindung prüfen'));
     document.head.appendChild(s);
