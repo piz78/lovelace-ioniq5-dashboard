@@ -104,6 +104,11 @@ class Ioniq5DashboardCard extends LitElement {
     this._lastHash    = null;
     this._pendingData = null;
     this._error       = null;
+    // Nur true, wenn sich die Fahrdaten seit dem letzten Render wirklich
+    // geändert haben (siehe willUpdate). Verhindert, dass updated() die
+    // Charts bei jedem hass-Tick (z.B. GPS/Sensor-Updates der iOS App)
+    // unnötig zerstört und neu aufbaut.
+    this._dataChanged = false;
 
     // ResizeObserver: Charts erst rendern, wenn die Card tatsächlich
     // eine Breite hat – löst das Problem mit HA-Unterseiten.
@@ -156,14 +161,20 @@ class Ioniq5DashboardCard extends LitElement {
     if (hash === this._lastHash) return;
     this._lastHash = hash;
 
-    this._data  = this._parseData(entity.attributes);
-    this._stats = this._data.length ? this._computeStats(this._data) : null;
+    this._data        = this._parseData(entity.attributes);
+    this._stats       = this._data.length ? this._computeStats(this._data) : null;
+    this._dataChanged = true;
   }
 
   // ── updated: Imperative Chart-Logik NACH dem Rendern ─────────────────────
   // Canvas-Elemente sind hier garantiert im Shadow DOM vorhanden.
+  // Läuft bei jedem hass-Update, baut die Charts aber nur neu auf, wenn sich
+  // die Fahrdaten tatsächlich geändert haben (_dataChanged), nicht bei jedem
+  // hass-Tick (sonst werden die Charts z.B. in der iOS-App durch häufige
+  // GPS-/Sensor-Updates ständig zerstört und neu aufgebaut).
   async updated(changedProps) {
-    if (!changedProps.has('hass') || !this._data?.length) return;
+    if (!this._dataChanged || !this._data?.length) return;
+    this._dataChanged = false;
 
     try {
       await loadChartJS();
