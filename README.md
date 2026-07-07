@@ -9,7 +9,7 @@ Liniendiagramme darstellt. Implementiert als eigenständige LitElement-Card
 Datei (LitElement und Chart.js sind eingebettet) – keine externen
 Abhängigkeiten, keine separaten Dateien zu installieren.
 
-[![Driving Stats](ioniq-driving-stats.jpg)]
+[Driving Stats](ioniq-driving-stats.jpg)
 
 ## Voraussetzung
 
